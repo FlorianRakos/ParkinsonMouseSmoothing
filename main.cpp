@@ -1,13 +1,15 @@
 #include <iostream>
 #include <Windows.h>
+#include <chrono>
 
 LRESULT CALLBACK EventHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+int deltaX = 0;
+int deltaY = 0;
+
 int main() {
-    std::cout << "Code runs" << std::endl;
 
     HINSTANCE hInstance = GetModuleHandle(NULL);
-
     const char *class_name = "SimpleEngine Class";
     WNDCLASS wc = {0};
     wc.lpfnWndProc = EventHandler; // Set the custom window procedure
@@ -35,27 +37,44 @@ int main() {
         std::cerr << "Failed to register for raw input -> Error: " << er << std::endl;
         return 1;
     }
-    std::cout << "Code runs3" << std::endl;
 
     MSG event;
     bool quit = false;
 
+
+
+    auto counter = std::chrono::system_clock::now();
+    double timeDelay = 0.001; //s
+
     while (!quit) {
         while (PeekMessage(&event, 0, 0, 0, PM_REMOVE)) {
-//            if (event.message == WM_QUIT) {
-//                quit = true;
-//                break;
-//            }
+            if (event.message == WM_QUIT) {
+                quit = true;
+                break;
+            }
             TranslateMessage(&event);
             DispatchMessage(&event);
-            //std::cout << "Event: " << event.message << std::endl;
+
         }
+        auto now = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed = now - counter;
+        double timeDiff = elapsed.count();
+
+
+            if (timeDiff >= timeDelay) {
+                std::cout << "Time: " << timeDiff << " DeltaX: " << deltaX << " DeltaY: " << deltaY << std::endl;
+                deltaX = 0;
+                deltaY = 0;
+                counter = std::chrono::system_clock::now();
+            }
 
 
     }
 
     return 0;
 }
+
+int lastMS = 0;
 
 LRESULT CALLBACK EventHandler(
         HWND hwnd,
@@ -75,8 +94,15 @@ LRESULT CALLBACK EventHandler(
 
 
             if (raw->header.dwType == RIM_TYPEMOUSE) {
-                std::cout << "Delta X: " << raw->data.mouse.lLastX << ", Delta Y: " << raw->data.mouse.lLastY
-                          << std::endl;
+                auto currentTime = std::chrono::system_clock::now();
+                auto durationSinceEpoch = currentTime.time_since_epoch();
+                int msSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(durationSinceEpoch).count();
+                int time = msSinceEpoch - lastMS;
+//                std::cout << "Time:" << time << " Delta X: " << raw->data.mouse.lLastX << ", Delta Y: " << raw->data.mouse.lLastY
+//                          << std::endl;
+                deltaX += raw->data.mouse.lLastX;
+                deltaY += raw->data.mouse.lLastY;
+                lastMS = msSinceEpoch;
             }
         }
             return 0;
