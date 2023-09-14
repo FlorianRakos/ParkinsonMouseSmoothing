@@ -1,0 +1,37 @@
+CREATE TABLE person
+(
+  person_id             INT unsigned NOT NULL,
+  name                  VARCHAR(150) NOT NULL,
+  job_title             VARCHAR(150),
+  performance           INT unsigned NOT NULL,
+  visual_impairment     BOOL NOT NULL,
+  physical_impairment   BOOL NOT NULL,
+  tremor                BOOL NOT NULL,
+  visual_diagnosis      VARCHAR(150),
+  physical_diagnosis    VARCHAR(150),
+  tremor_diagnosis      VARCHAR(150),
+  using_filters         BOOL NOT NULL,
+  using_footmouse       BOOL NOT NULL,
+  using_stabiliser      BOOL NOT NULL,
+  pre_use_performance   INT unsigned,
+  PRIMARY KEY           (person_id)
+);
+
+CREATE TABLE session
+(
+  session_id            INT unsigned NOT NULL,
+  user_id               INT unsigned NOT NULL,
+  PRIMARY KEY           (session_id),
+  FOREIGN KEY           (user_id) REFERENCES person(person_id)
+);
+
+CREATE TABLE movement
+(
+  movement_id           INT unsigned NOT NULL,
+  session               INT unsigned NOT NULL,
+  X                     INT NOT NULL,
+  Y                     INT NOT NULL,
+  timestamp             DATETIME NOT NULL,
+  PRIMARY KEY           (movement_id),
+  FOREIGN KEY           (session) REFERENCES session(session_id)
+);

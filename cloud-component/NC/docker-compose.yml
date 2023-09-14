@@ -1,0 +1,22 @@
+version: "1"
+services:
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: temporary
+      MYSQL_DATABASE: mousedata
+      MYSQL_USER: NotCapricorns
+      MYSQL_PASSWORD: test
+
+  node-red:
+    image: nodered/node-red
+    ports:
+      - 4718:1880
+    restart: always
+    volumes:
+      - node_red_data:/data
+
+volumes:
+  mysql_data:
+  node_red_data:
