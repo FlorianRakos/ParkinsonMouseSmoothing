@@ -6,8 +6,10 @@
 #include "rapidjson/stringbuffer.h"
 #include <string>
 #include <stdlib.h>
+#include <fstream>
+#include <filesystem>
 
-//mousetrap
+namespace fs = std::filesystem;
 
 LRESULT CALLBACK EventHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -16,20 +18,78 @@ int deltaY = 0;
 rapidjson::Document document;
 rapidjson::Value dataArray(rapidjson::kArrayType);
 
+size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* output) {
+    size_t totalSize = size * nmemb;
+    output->append(static_cast<char*>(contents), totalSize);
+    return totalSize;
+}
+
+std::string getTimestamp() {
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+    std::tm* now_tm = std::localtime(&now_c);
+
+    char buffer[80];
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H-%M-%S", now_tm);
+
+    return std::string(buffer);
+}
+
+void pythonPost (std::string filePath) {
+
+    const std::string pythonCommand = "python ../post.py -f \""  + filePath + "\"";
+    std::cout <<"Run: " << pythonCommand << std::endl;
+
+    // Open a pipe to capture the output of the Python script
+    FILE* pipe = popen(pythonCommand.c_str(), "r");
+    if (!pipe) {
+        std::cerr << "Error opening pipe to Python script." << std::endl;
+        return;
+    }
+
+    char buffer[128];
+    std::string output;
+
+    // Read the output of the Python script line by line
+    while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+        output += buffer;
+    }
+
+    // Close the pipe
+    pclose(pipe);
+
+    // Print the captured output
+    std::cout << "Output from Python script:\n" << output << std::endl;
+}
 
 void saveJSON () {
     std::cout << "-------Save JSON-------" << std::endl;
-    // Add the dataArray to the document
-    document.AddMember("data", dataArray, document.GetAllocator());
 
-    // Serialize the document to a JSON string
-    rapidjson::StringBuffer buffer;
+    document.AddMember("data", dataArray, document.GetAllocator());// Add the dataArray to the document
+
+    rapidjson::StringBuffer buffer;// Serialize the document to a JSON string
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     document.Accept(writer);
 
-    // Print the JSON string
     std::string jsonString = buffer.GetString();
-    std::cout << "JSON: " << jsonString << std::endl;
+
+    std::string filename = "\\MouseData_" + getTimestamp() + ".json";
+    std::string dir = "C:\\Users\\flori\\Desktop\\International Minor\\ParkinsonMouse\\RawMouseAnalyzer\\output";
+    std::string filePath = dir + filename;
+
+    std::ofstream outputFile(filePath);
+
+    // Check if the file was opened successfully
+    if (!outputFile.is_open()) {
+        std::cerr << "Failed to open the file for writing: " << filename << std::endl;
+        return;
+    }
+
+    outputFile << jsonString;// Write the JSON string to the file
+    outputFile.close();// Close the file
+    std::cout << "JSON saved to file: " << filename << std::endl;
+
+    pythonPost(filePath);
 }
 
 void processJSON (double time, int deltaX, int deltaY) {
@@ -52,28 +112,39 @@ void processJSON (double time, int deltaX, int deltaY) {
     // Print the JSON string
     std::string jsonString = buffer.GetString();
     //std::cout << "JSON: " << jsonString << std::endl;
-
- // print json
-    //saveJSON(dataArray);
-
 }
 
 bool isKeyPressed(int keyCode) {
     return GetAsyncKeyState(keyCode) & 0x8000;
 }
 
-int main() {
+int getSessionID (std::string directoryPath) {
+    // Check if the directory exists
+    if (!std::filesystem::exists(directoryPath)) {
+        std::cerr << "Directory does not exist." << std::endl;
+        return 1;
+    }
 
+    // Iterate over the files in the directory
+    int fileCount = 0;
+    for (const auto& entry : fs::directory_iterator(directoryPath)) {
+        if (entry.is_regular_file()) {
+            fileCount++;
+        }
+    }
+    return fileCount + 1;
+}
+
+int main() {
+    std::cout << "Program start" << std::endl;
     std::atexit(saveJSON);
 
-    //Prepare json
-    document.SetObject();
+    document.SetObject();//Prepare json
 
-    // Add the sessionID as a string
+    int id = getSessionID("../output");
     rapidjson::Value sessionID;
-    sessionID.SetString("1", document.GetAllocator());
+    sessionID.SetInt(id);
     document.AddMember("sessionID", sessionID, document.GetAllocator());
-
 
 
     HINSTANCE hInstance = GetModuleHandle(NULL);
@@ -113,7 +184,7 @@ int main() {
     auto counter = std::chrono::system_clock::now();
     double timeDelay = 0.005; //s
 
-
+    std::cout << "Collect Mouse Data... Quit with Q" << std::endl;
     while (!quit) {
         while (PeekMessage(&event, 0, 0, 0, PM_REMOVE)) {
             if (event.message == WM_QUIT) {
@@ -187,7 +258,7 @@ LRESULT CALLBACK EventHandler(
         }
             return 0;
         default: {
-            std::cout << "Any event" << std::endl;
+            //std::cout << "Any event" << std::endl;
         }
     }
 
