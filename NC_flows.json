@@ -1,0 +1,659 @@
+[
+    {
+        "id": "f6f2187d.f17ca8",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "8e2f983d4c4129ca",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "startup",
+        "info": "",
+        "x": 190,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "d8e252bc296ad5fb",
+        "type": "http in",
+        "z": "f6f2187d.f17ca8",
+        "name": "movements",
+        "url": "/movements",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 420,
+        "wires": [
+            [
+                "a6e2442494ffbe7e",
+                "c8d3e5a39c6237e9"
+            ]
+        ]
+    },
+    {
+        "id": "a6448e7763079309",
+        "type": "http response",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 620,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "a6e2442494ffbe7e",
+        "type": "delay",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 400,
+        "y": 420,
+        "wires": [
+            [
+                "a6448e7763079309",
+                "08cd3bec7e1e1f94"
+            ]
+        ]
+    },
+    {
+        "id": "1334c6c3b837aedc",
+        "type": "mysql",
+        "z": "f6f2187d.f17ca8",
+        "mydb": "931716dcb9e6de8d",
+        "name": "",
+        "x": 650,
+        "y": 960,
+        "wires": [
+            [
+                "9d8809ef2338e9eb"
+            ]
+        ]
+    },
+    {
+        "id": "57b04a1f7cc54923",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 960,
+        "wires": [
+            [
+                "13b5adef2ba4a717"
+            ]
+        ]
+    },
+    {
+        "id": "13b5adef2ba4a717",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "query setting",
+        "func": "//var query = \"INSERT INTO person(person_id, name, job_title, performance, visual_impairment, physical_impairment, tremor, physical_diagnosis, using_filters, using_footmouse, using_stabiliser, pre_use_performance) VALUES(0, 'Jeffrey Nohands', 'assistant to the manager', 8, false, true, false, 'LHRH', false, true, false, 5);\";\n\n//var query = \"INSERT INTO person(person_id, name, job_title, performance, visual_impairment, physical_impairment, tremor, physical_diagnosis, tremor_diagnosis, using_filters, using_footmouse, using_stabiliser, pre_use_performance) VALUES(1, 'Clumsy Steve', 'assistant manager', 8, false, true, true, 'RFRH', 'functional', false, true, true, 5);\";\n\n//var query = \"INSERT INTO person(person_id, name, job_title, performance, visual_impairment, physical_impairment, tremor, visual_diagnosis, using_filters, using_footmouse, using_stabiliser, pre_use_performance) VALUES(2, 'Mona Chromia', 'manager', 8, true, false, false, 'achromatopsia', true, false, false, 5);\";\n\n//var query = \"INSERT INTO person(person_id, name, job_title, performance, visual_impairment, physical_impairment, tremor, visual_diagnosis, physical_diagnosis, tremor_diagnosis, using_filters, using_footmouse, using_stabiliser, pre_use_performance) VALUES(3, 'Unlucky Brenda', 'Chief Eexecutive Officer', 10, true, true, true, 'color_blindness', 'LFRFLH', 'parkinsonian', true, true, false, 3);\";\n\n//var query = \"INSERT INTO person(person_id, name, job_title, performance, visual_impairment, physical_impairment, tremor, using_filters, using_footmouse, using_stabiliser, pre_use_performance) VALUES(4, 'Smug Dylan', 'Chief Diversity Officer ', 7, false, false, false, false, false, false, 7);\";\n\nvar query = \"INSERT INTO session(session_id, user_id) VALUES(4,1),(5,1),(6,3),(7,1),(8,1),(9,1),(10,3),(11,1);\"\n\nmsg.topic = query;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 960,
+        "wires": [
+            [
+                "1334c6c3b837aedc"
+            ]
+        ]
+    },
+    {
+        "id": "9d8809ef2338e9eb",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 880,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "bb4f5cf5d3e47911",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "initialise flow variables",
+        "func": "flow.set(\"max\", 0);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "89191cc26ebfd451",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "startup",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 100,
+        "wires": [
+            [
+                "bb4f5cf5d3e47911",
+                "7d70d62148004e42"
+            ]
+        ]
+    },
+    {
+        "id": "bd5cad69af4f36d9",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "format query",
+        "func": "msg.topic = msg.payload;\nreturn msg;\n\nvar big_old_string = \"\";\n\nfor (var i = 0; i < msg.payload.length; i++) \n{\n    big_old_string += msg.payload[i]\n    if (i != msg.payload.length)\n    {\n        big_old_string += \"; \";\n    }\n    else\n    {\n        big_old_string += \";\";\n    }\n}\nmsg.topic = big_old_string;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 870,
+        "y": 420,
+        "wires": [
+            [
+                "99dcf4cb5bda62d7"
+            ]
+        ]
+    },
+    {
+        "id": "7d70d62148004e42",
+        "type": "delay",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "100",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 410,
+        "y": 180,
+        "wires": [
+            [
+                "ac95154b69755a2f"
+            ]
+        ]
+    },
+    {
+        "id": "ac95154b69755a2f",
+        "type": "link out",
+        "z": "f6f2187d.f17ca8",
+        "name": "link out 1",
+        "mode": "link",
+        "links": [],
+        "x": 595,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "9ddb12e575162d80",
+        "type": "link in",
+        "z": "f6f2187d.f17ca8",
+        "name": "get max",
+        "links": [
+            "c8d3e5a39c6237e9"
+        ],
+        "x": 225,
+        "y": 300,
+        "wires": [
+            [
+                "f8f08db8c5e5c347"
+            ]
+        ]
+    },
+    {
+        "id": "f8f08db8c5e5c347",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "get movements",
+        "func": "msg.topic = \"SELECT * FROM movement;\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 300,
+        "wires": [
+            [
+                "5b8f39fc29bc328e"
+            ]
+        ]
+    },
+    {
+        "id": "5b8f39fc29bc328e",
+        "type": "mysql",
+        "z": "f6f2187d.f17ca8",
+        "mydb": "931716dcb9e6de8d",
+        "name": "",
+        "x": 670,
+        "y": 300,
+        "wires": [
+            [
+                "3965efb59d96d827"
+            ]
+        ]
+    },
+    {
+        "id": "3965efb59d96d827",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "find and set max",
+        "func": "var max = 0;\n\nif (msg.payload === null)\n{\n    return;\n}\nfor(var i = 0; i < msg.payload.length; i++)\n{\n    if (msg.payload[i].movement_id > max)\n    max = msg.payload[i].movement_id;\n}\nflow.set(\"max\", max);\nreturn;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c8d3e5a39c6237e9",
+        "type": "link out",
+        "z": "f6f2187d.f17ca8",
+        "name": "link out 2",
+        "mode": "link",
+        "links": [
+            "9ddb12e575162d80"
+        ],
+        "x": 355,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "523b29acf4272473",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "flow variables",
+        "info": "",
+        "x": 170,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "695dc9e49b87be0a",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "HTTP in",
+        "info": "",
+        "x": 180,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "eb14491ace7e8a18",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "manual populating",
+        "info": "",
+        "x": 150,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "08cd3bec7e1e1f94",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "reformat json",
+        "func": "var session_id = msg.payload.sessionID;\nvar array = msg.payload.data;\nvar queries = new Array();\nvar id = (flow.get(\"max\") + 1);\n\n/*\nfor (var i = 0; i < array.length; i++)\n{\n    query += (id + i).toString();\n    query += \", \";\n    query += session_id;\n    query += \", \";\n    query += array[i].deltaX.toString();\n    query += \", \";\n    query += array[i].deltaY.toString();\n    query += \", \";\n    query += array[i].timestamp;\n    //query += \"FROM_UNIXTIME(\" + array[i].timestamp.toString() + \")\" \n    //var time = new Date(array[i].timestamp)\n    //query += time.toISOString().slice(0, 19).replace('T', ' ');\n    query += \")\"\n\n    queries.push(query);\n}\n*/\nvar query = \"INSERT INTO movement(movement_id, session, x, y, timestamp) VALUES\";\n\nfor (var i = 0; i < array.length; i++) {\n    query += \"(\";\n    query += (id + i).toString();\n    query += \", \";\n    query += session_id;\n    query += \", \";\n    query += array[i].deltaX.toString();\n    query += \", \";\n    query += array[i].deltaY.toString();\n    query += \", \";\n    query += array[i].timestamp;\n    if (i == (array.length -1))\n    {\n        query += \");\"\n    }\n    else \n    {\n        query += \"),\";\n    }\n}\n\nmsg.payload = query;\n\n//msg.payload = query.substring(query.length - 6, query.length);\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 420,
+        "wires": [
+            [
+                "bd5cad69af4f36d9"
+            ]
+        ]
+    },
+    {
+        "id": "99dcf4cb5bda62d7",
+        "type": "mysql",
+        "z": "f6f2187d.f17ca8",
+        "mydb": "931716dcb9e6de8d",
+        "name": "",
+        "x": 1110,
+        "y": 420,
+        "wires": [
+            [
+                "f9a6facfa6b3ac80"
+            ]
+        ]
+    },
+    {
+        "id": "f9a6facfa6b3ac80",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1340,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "fe60bb6d35990dd5",
+        "type": "mysql",
+        "z": "f6f2187d.f17ca8",
+        "mydb": "931716dcb9e6de8d",
+        "name": "",
+        "x": 650,
+        "y": 1100,
+        "wires": [
+            [
+                "9548d51566f68839"
+            ]
+        ]
+    },
+    {
+        "id": "0b53fe3521cff4f7",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 1100,
+        "wires": [
+            [
+                "1441aed9eb10872b"
+            ]
+        ]
+    },
+    {
+        "id": "1441aed9eb10872b",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "query setting",
+        "func": "var query = \"DELETE FROM movement;\"\n\nmsg.topic = query;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 1100,
+        "wires": [
+            [
+                "fe60bb6d35990dd5"
+            ]
+        ]
+    },
+    {
+        "id": "9548d51566f68839",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 8",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 880,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "dcab95c8e8e91a4c",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "manual culling",
+        "info": "",
+        "x": 170,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "d0b7ead2de0d2b1c",
+        "type": "mysql",
+        "z": "f6f2187d.f17ca8",
+        "mydb": "931716dcb9e6de8d",
+        "name": "",
+        "x": 410,
+        "y": 1280,
+        "wires": [
+            [
+                "42d109ab954cf3d8",
+                "f8095764ced77198"
+            ]
+        ]
+    },
+    {
+        "id": "1fcd9ab633736216",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "get person",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "SELECT * FROM person;",
+        "x": 180,
+        "y": 1240,
+        "wires": [
+            [
+                "d0b7ead2de0d2b1c"
+            ]
+        ]
+    },
+    {
+        "id": "42d109ab954cf3d8",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 9",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 640,
+        "y": 1240,
+        "wires": []
+    },
+    {
+        "id": "e3a6f92a8c3c1102",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "manual display",
+        "info": "",
+        "x": 160,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "85fc90ad6136e928",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "get movement",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "SELECT * FROM movement;",
+        "x": 170,
+        "y": 1280,
+        "wires": [
+            [
+                "d0b7ead2de0d2b1c"
+            ]
+        ]
+    },
+    {
+        "id": "b294cf6f1c2798bc",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "get session",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "SELECT * FROM session;",
+        "x": 170,
+        "y": 1320,
+        "wires": [
+            [
+                "d0b7ead2de0d2b1c"
+            ]
+        ]
+    },
+    {
+        "id": "f8095764ced77198",
+        "type": "ui_table",
+        "z": "f6f2187d.f17ca8",
+        "group": "a21aad30831219e5",
+        "name": "",
+        "order": 0,
+        "width": "27",
+        "height": "8",
+        "columns": [],
+        "outputs": 0,
+        "cts": false,
+        "x": 630,
+        "y": 1280,
+        "wires": []
+    },
+    {
+        "id": "931716dcb9e6de8d",
+        "type": "MySQLdatabase",
+        "z": null,
+        "name": "",
+        "host": "mysql",
+        "port": "3306",
+        "db": "mousedata",
+        "tz": "",
+        "charset": "UTF8"
+    },
+    {
+        "id": "a21aad30831219e5",
+        "type": "ui_group",
+        "name": "Default",
+        "tab": "49c83e1cb793d255",
+        "order": 1,
+        "disp": true,
+        "width": "27",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "49c83e1cb793d255",
+        "type": "ui_tab",
+        "name": "NC",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
