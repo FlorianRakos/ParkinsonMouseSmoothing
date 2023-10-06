@@ -1,28 +1,23 @@
 #include <iostream>
 #include <Windows.h>
 #include <chrono>
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
 #include <string>
 #include <stdlib.h>
 #include <fstream>
 #include <filesystem>
 #include <vector>
+#include <cmath>
 
-namespace fs = std::filesystem;
+using namespace std;
+namespace fs = filesystem;
+
 
 LRESULT CALLBACK EventHandler(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-int deltaX = 0;
-int deltaY = 0;
 
-std::vector<std::pair<int, int>> mouseMovements;
-int lengthBuffer = 10000;
 
-POINT curPos;
 
-size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* output) {
+size_t WriteCallback(void* contents, size_t size, size_t nmemb, string* output) {
     size_t totalSize = size * nmemb;
     output->append(static_cast<char*>(contents), totalSize);
     return totalSize;
@@ -34,11 +29,11 @@ bool isKeyPressed(int keyCode) {
 }
 
 int main() {
-    std::cout << "Program start" << std::endl;
+    cout << "Program start" << endl;
 
-    std::vector<std::pair<int,int>> testVec;
-    testVec.push_back(std::make_pair(1,2));
-    std::cout << testVec.size() << std::endl;
+    vector<pair<int,int>> testVec;
+    testVec.push_back(make_pair(1,2));
+    cout << testVec.size() << endl;
 
 
 
@@ -67,7 +62,7 @@ int main() {
 
     if (RegisterRawInputDevices(&rid, 1, sizeof(rid)) == FALSE) {
         DWORD er = GetLastError();
-        std::cerr << "Failed to register for raw input -> Error: " << er << std::endl;
+        cerr << "Failed to register for raw input -> Error: " << er << endl;
         return 1;
     }
 
@@ -76,7 +71,7 @@ int main() {
 
 
 
-    std::cout << "Apply Smoothing... Quit with Q" << std::endl;
+    cout << "Apply Smoothing... Quit with Q" << endl;
     while (!quit) {
         while (PeekMessage(&event, 0, 0, 0, PM_REMOVE)) {
             if (event.message == WM_QUIT) {
@@ -89,7 +84,7 @@ int main() {
 
         // Keycode 81 = Q
         if (isKeyPressed(81)) {
-            std::cout << "Key with code " << 81 << " is pressed. Exiting..." << std::endl;
+            cout << "Key with code " << 81 << " is pressed. Exiting..." << endl;
             return 0; // Exit the program
         }
 
@@ -99,7 +94,13 @@ int main() {
     return 0;
 }
 
+
+vector<pair<int, int>> mouseMovements;
+int lengthBuffer = 1;
+POINT curPos;
 int lastMS = 0;
+int lastXPos = 0;
+int lastYPos = 0;
 
 LRESULT CALLBACK EventHandler(
         HWND hwnd,
@@ -112,7 +113,7 @@ LRESULT CALLBACK EventHandler(
             PostQuitMessage(0);
             return 0;
         case WM_INPUT: {
-            //std::cout << "Input Event" << std::endl;
+            //cout << "Input Event" << endl;
             unsigned size = sizeof(RAWINPUT);
             static RAWINPUT raw[sizeof(RAWINPUT)];
             GetRawInputData((HRAWINPUT) lparam, RID_INPUT, raw, &size, sizeof(RAWINPUTHEADER));
@@ -120,39 +121,55 @@ LRESULT CALLBACK EventHandler(
 
             if (raw->header.dwType == RIM_TYPEMOUSE) {
 
-                int deltaX = raw->data.mouse.lLastX;
-                int deltaY = raw->data.mouse.lLastY;
+                int deltaXRaw = raw->data.mouse.lLastX;
+                int deltaYRaw = raw->data.mouse.lLastY;
 
-                mouseMovements.push_back(std::make_pair(deltaX, deltaY));
+                mouseMovements.emplace_back(deltaXRaw, deltaYRaw);
+
 
                 if (mouseMovements.size() > lengthBuffer) {
                     mouseMovements.erase(mouseMovements.begin());
                 }
+
+
                 float weightedSumX;
                 float weightedSumY;
                 int movementsLength = mouseMovements.size();
                 int weightAmountLength = movementsLength * (movementsLength + 1) / 2; // e.a. 100+99+98...+1
 
-                //std::cout <<"movementsLength: " << movementsLength << std::endl;
+                GetCursorPos(&curPos);
+
                 for (int i = 0; i < movementsLength; i++) {
                     mouseMovements[i];
-                    weightedSumX += mouseMovements[i].first * i / weightAmountLength;
-                    weightedSumY += mouseMovements[i].second * i / weightAmountLength;
+                    weightedSumX += mouseMovements[i].first * (i + 1);// / weightAmountLength;
+                    weightedSumY += mouseMovements[i].second * (i + 1) ;// / weightAmountLength;
+
                 }
 
-                GetCursorPos(&curPos);
-                //std::cout << curPos.x << " " << curPos.y << std::endl;
+                float deltaX = weightedSumX / weightAmountLength;
+                float deltaY = weightedSumY / weightAmountLength;
 
-                int nextX = curPos.x + weightedSumX ;
-                int nextY = curPos.y + weightedSumY;
+                float speed = 0.9f;
+                float exponent = 0.7f;
+                float distance = (abs(deltaX) + abs(deltaY)) / 2.0f;
+                float xTransformed = deltaX * pow(exponent, distance ) * speed;
+                float yTransformed = deltaY * pow(exponent, distance) * speed;
+
+                int nextX = lastXPos + round(xTransformed); //movementsLength ;
+                int nextY = lastYPos + round(yTransformed); //movementsLength;
+
 
                 SetCursorPos(nextX, nextY);
+
+                GetCursorPos(&curPos);
+                lastXPos = curPos.x;
+                lastYPos = curPos.y;
 
             }
         }
             return 0;
         default: {
-            //std::cout << "Any event" << std::endl;
+            //cout << "Any event" << endl;
         }
     }
 
